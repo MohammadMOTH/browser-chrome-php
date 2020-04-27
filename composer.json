@@ -25,7 +25,7 @@
     "extra": {
         "laravel":{
             "providers": [
-                "browserbotphp\\browser\\Providers\\BrowserProviders"
+                "BrowserBotPHP\\Browser\\Providers\\BrowserProviders" 
             ]
         }
     },
