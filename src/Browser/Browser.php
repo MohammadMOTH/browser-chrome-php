@@ -7,11 +7,12 @@ namespace BrowserBotPHP\Browser\Browser;
 class Browser
 {
 
+    const PathAppjs ="NodejsApp/app.js";
+
+
     public function boot()
     {
 
-        echo "hi";
-        # code...
     }
     public function register()
     {
