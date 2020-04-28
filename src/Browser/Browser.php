@@ -2,20 +2,35 @@
 
 namespace BrowserBotPHP\Browser\Browser;
 
-
+use Symfony\Component\Process\Process;
 
 class Browser
 {
 
-    const PathAppjs ="NodejsApp/app.js";
+    const PathNodeJsApp = "/NodeApp/app.js";
 
 
-    public function boot()
+    public function Run()
     {
 
-    }
-    public function register()
-    {
-        # code...
+        $process = new Process(["node", __DIR__ . self::PathNodeJsApp, "test"]);
+        $process->start();
+
+
+        // ... do other things
+        $x = 1;
+        while ($process->isRunning()) {
+            sleep(1);
+            $x++;
+            echo $x . " am wait here" . PHP_EOL;
+            echo $process->getOutput() . PHP_EOL;
+        }
+        // executes after the command finishes
+        if (!$process->isSuccessful()) {
+            throw new ProcessFailedException($process);
+        } else {
+
+            echo $process->getOutput();
+        }
     }
 }
