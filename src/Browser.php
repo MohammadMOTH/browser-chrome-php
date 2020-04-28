@@ -3,9 +3,9 @@
 namespace BrowserBotPHP\Browser;
 
 
-use BrowserBotPHP\Browser\Browser\Browser as BrowserBase;
+use BrowserBotPHP\Browser\Browser\BrowserBase ;
 
-class Browser extends BrowserBase
+class BrowserRun extends BrowserBase
 {
 
 

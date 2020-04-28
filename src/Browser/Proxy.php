@@ -6,20 +6,17 @@ class Proxy
 {
 
 
-    public static $DefaultProxy;
+    public static $DefaultProxy = null;
 
     public static $ProxyList;
 
+    protected  $_ip;
+    protected  $_port;
+    protected  $_username;
+    protected  $_password;
 
 
-
-    private  $_ip;
-    private  $_port;
-    private  $_username;
-    private  $_password;
-
-
-    function __construct($Ip, $Port, $Username = "", $passport = "", Bool $SetAsDefaultProxy)
+    function __construct($Ip, $Port, $Username = "", $passport = "", Bool $SetAsDefaultProxy = false)
     {
 
         $this->_ip = $Ip;
