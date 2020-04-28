@@ -23,7 +23,7 @@ class BrowserBase
     protected $_cookies = array();
     protected $_url;
 
-    public function __construct($MaxTimeout = 300, Proxy &$proxy = null, $CookiesArray = null, $url = null)
+    public function __construct($MaxTimeout = 300, $CookiesArray = null, $url = null , Proxy &$proxy = null)
     {
         $this->_maxTimeout =  $MaxTimeout;
 
@@ -126,6 +126,7 @@ class BrowserBase
             $x++;
             echo $x . " am wait here" . PHP_EOL;
             echo $this->_process->getOutput() . PHP_EOL;
+            echo $this->_process->getErrorOutput() . PHP_EOL;
         }
         // executes after the command finishes
         if (!$this->_process->isSuccessful()) {
