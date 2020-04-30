@@ -27,14 +27,21 @@ class ListBrowser
 
     public static function UpdateBrwoser()
     {
-        /// update here from https://symfony.com/doc/current/components/process.html#reference-process-signal
-        foreach (ListBrowser::$ListBrowser as $key =>  $browserInList) {
-            if (!$browserInList->_process->isRunning()) {
 
-                unset(ListBrowser::$ListBrowser[$key]);
-            } elseif (!$browserInList->IsTimeOut()) {
-                unset(ListBrowser::$ListBrowser[$key]);
+        if (self::GetCount() == 0)
+            return false;
+
+        return true;
+    }
+    public static function GetCount()
+    {
+        $count = 0;
+        foreach (ListBrowser::$ListBrowser as $key =>  $browserInList) {
+            if (!(!$browserInList->IsRun() || $browserInList->IsTimeOut())) {
+
+                $count++;
             }
         }
+        return $count;
     }
 }

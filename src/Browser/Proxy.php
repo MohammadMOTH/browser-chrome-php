@@ -2,7 +2,9 @@
 
 namespace BrowserBotPHP\Browser\Browser;
 
-class Proxy
+use JsonSerializable;
+
+class Proxy implements JsonSerializable
 {
 
 
@@ -35,6 +37,16 @@ class Proxy
     {
         return $this->_ip . ":" . $this->_port;
     }
+    public function returnIp()
+    {
+        return $this->_ip;
+    }
+
+    public function returnPort()
+    {
+        return $this->_port;
+    }
+
 
     public function returnUsername()
     {
@@ -43,5 +55,16 @@ class Proxy
     public function returnPassword()
     {
         return $this->_password;
+    }
+
+    public function jsonSerialize()
+    {
+        return
+            [
+                'ip'   => $this->returnIp(),
+                'port' => $this->returnPort(),
+                'username' => $this->returnUsername(),
+                'password' => $this->returnPassword(),
+            ];
     }
 }
