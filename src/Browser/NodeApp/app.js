@@ -1,58 +1,87 @@
-const puppeteer = require('puppeteer');
-console.log(process.argv);
+try {
 
-const windowSet = (page, name, value) =>
-    page.evaluateOnNewDocument(`
-    Object.defineProperty(window, '${name}', {
-      get() {
-        return '${value}'
-      }
+
+    const puppeteer = require('puppeteer');
+
+    process.on('unhandledRejection', err => {
+        console.error('There was an uncaught error', err)
+        process.exit(1) //mandatory (as per the Node.js docs)
     })
-`)
-    ;
 
 
-(async () => {
-    const proxyUrl = 'http://168.81.230.104:3199';
-    const username = 'tamimalazrak-4fbhj';
-    const password = 'D49CjUnIvy';
+    var path = process.argv;
+    const data = JSON.parse(path[2]);
 
-    const browser = await puppeteer.launch({
-        args: [`--proxy-server=${proxyUrl}`, `--no-sandbox`]
-    });
 
-    const page = await browser.newPage();
+    (async () => {
+        const proxyUrl = 'http://' + data.Proxy.ip + ':' + data.Proxy.port;
+        const username = data.Proxy.username;
+        const password = data.Proxy.password;
 
-    await page.authenticate({ username, password });
-    //await page.addScriptTag({path: 'test.js'});
-    await page.goto('http://www.example.com');
-    await page.addScriptTag({ url: 'https://code.jquery.com/jquery-3.2.1.min.js' });
+        const browser = await puppeteer.launch({
+            args: [`--proxy-server=${proxyUrl}`, `--no-sandbox`]
+        });
+        const page = await browser.newPage();
 
-    await page.addScriptTag({ path: 'test.js' });
-    const title = await page.evaluate(() => {
-        const $ = window.$; //otherwise the transpiler will rename it and won't work
+        if (data.UserAgent != null)
+            await page.setUserAgent(data.UserAgent);
 
-        return $(document.querySelector("body > div > h1")).html();
-    }); const dimensions = await page.evaluate(() => {
-        window.x = window.x + window.y;
-        return {
-            width: document.documentElement.clientWidth,
-            height: document.documentElement.clientHeight,
-            deviceScaleFactor: window.devicePixelRatio,
-            X: window.x
-        };
-    });
-    await page.evaluate(() => { console.log(window.x) });
-    console.log('Dimensions:', dimensions);
-    console.log(title);
+        await page.authenticate({ username, password });
 
-    await sleep(3000);
-    console.log(await page.evaluate(() => { return window.x }));
-    // await page.evaluate(() => console.log(`url is ${location.href}`));
-    await page.screenshot({ path: '.././beta/public/file3.png' });
-    await browser.close();
-})();
-function sleep(ms) {
+        await page.setCookie(...data.Cookies);
+        await page.goto(data.Url);
+        ////////////
+        try {
+
+            await page.addScriptTag({ path: data.FileOutputJs }); // base js file
+
+        }
+        catch (err) {
+            console.error(err.message)
+            process.exit(1);
+        }
+        ///////////
+        ////////////
+        try {
+            if (data.JsInfoPath != null)
+                await page.addScriptTag({ path: data.JsInfoPath });
+
+        }
+        catch (err) {
+            console.error(err.message)
+            process.exit(1);
+        }
+        ///////////
+        for (let index = 0; index < data.JsCodePath.length; index++) {
+            try {
+                await page.addScriptTag({ path: data.JsCodePath[index] });
+            }
+            catch (err) {
+                console.error(err.message)
+                process.exit(1);
+            }
+
+        }
+
+        while (!await page.evaluate(() => { return window.canexit; })) {
+
+            await sleepms(1000);
+
+        }
+        if (data.SaveImage != null)
+            await page.screenshot({ path: data.SaveImage });
+
+        const output = await page.evaluate(() => { return window.output; });
+        console.log("<o$$&ut>" + JSON.stringify(output) + "</o$$&ut>");
+
+        await browser.close();
+    })();
+} catch (error) {
+    console.error(error.message)
+    process.exit();
+}
+
+function sleepms(ms) {
     return new Promise((resolve) => {
         setTimeout(resolve, ms);
     });
