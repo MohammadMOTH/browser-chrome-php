@@ -2,6 +2,7 @@
 
 namespace BrowserBotPHP\Browser\Browser;
 
+use BrowserBotPHP\STemplates\STemplates;
 use stdClass;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
@@ -15,7 +16,7 @@ class BrowserBase
 
     const PathNodeJsApp = "/NodeApp/app.js";
     const Tagout = "o$$&ut";
-    const FileOutputJs = "./fileoutput.js";
+    const FileOutputJs = "/fileoutput.js";
     protected  $_timestart = 0;
 
 
@@ -36,10 +37,6 @@ class BrowserBase
      */
     protected $_proxy;
     /**
-     * @var boolean Started or not
-     */
-    protected $_isStarted = false;
-    /**
      * @var array Command Args for Node.js App
      */
     protected $_command = array();
@@ -54,11 +51,7 @@ class BrowserBase
     /**
      * @var String Url
      */
-    protected $_url;
-    /**
-     * @var null
-     */
-
+    protected $_url = null;
     /**
      * @var string User Agent Browser
      */
@@ -78,7 +71,7 @@ class BrowserBase
      *
      * @return void
      */
-    public function __construct($MaxTimeout = 300, $CookiesArray = null, $url = null, Proxy &$proxy = null)
+    public function __construct($MaxTimeout = 300, $CookiesArray = null, string $url = null, Proxy &$proxy = null)
     {
         $this->_maxTimeout =  $MaxTimeout;
 
@@ -93,8 +86,8 @@ class BrowserBase
 
         if (is_array($CookiesArray))
             $this->SetCookies($CookiesArray);
-
-        $this->SetUrl($url);
+        if ($url != null)
+            $this->SetUrl($url);
     }
     /**
      * set up path file js , to injection js
@@ -118,6 +111,7 @@ class BrowserBase
     public function SavePhotoPath(string $path)
     {
         $this->_makePhoto = $path;
+
         return $this;
     }
 
@@ -179,15 +173,6 @@ class BrowserBase
         return $this;
     }
 
-    /**
-     *  Return if started or not
-     * @return bool
-     */
-    public function IsStarted()
-    {
-        return $this->_isStarted;
-    }
-
 
     /**
      * Get Time Start as Timestamp
@@ -242,7 +227,10 @@ class BrowserBase
     {
         $this->_cheakTimeout();
 
-        return $this->_process->isRunning();
+        if ($this->_process != null)
+            return $this->_process->isRunning();
+        else
+            return false;
     }
     /**
      * run and wait to exit
@@ -298,7 +286,7 @@ class BrowserBase
     public function Run()
     {
 
-        if ($this->IsStarted()) //if started befor
+        if ($this->IsRun()) //if started befor
             return false;
 
         $this->_before();
@@ -309,6 +297,7 @@ class BrowserBase
         ///https://symfony.com/doc/current/components/process.html#stopping-a-process
         ////////////////////////////////////////////////////
         $this->_process = new Process($this->_command);
+        //print_r($this->_command);
         $this->_process->setTimeout($this->_maxTimeout);
         $this->_process->start();
         //  if(defined('SIGINT')) // linux
@@ -347,7 +336,6 @@ class BrowserBase
      */
     protected function start()
     {
-        $this->_isStarted = true;
         $this->_timestart = time();
         return $this;
     }
@@ -358,6 +346,9 @@ class BrowserBase
      */
     private function _cheakTimeout()
     {
+        if ($this->_process == null)
+            return false;
+
         try {
             $this->_process->checkTimeout();
         } catch (\Throwable $th) {
@@ -393,8 +384,12 @@ class BrowserBase
         $data->Url =  $this->_url;
         $data->JsInfoPath =  $this->_jsPassInfo;
         $data->JsCodePath =  $this->_jsPassCode;
-        $data->SaveImage = $this->_makePhoto;
-        $data->FileOutputJs = self::FileOutputJs;
+        $Stemp = new STemplates();
+
+        if ($this->_makePhoto != null)
+            $data->SaveImage = $Stemp->Process($this->_makePhoto)->GetOutput();
+
+        $data->FileOutputJs = __DIR__ . self::FileOutputJs;
         $this->_command[] = json_encode($data);
 
         return $this;

@@ -14,20 +14,29 @@ try {
 
 
     (async () => {
-        const proxyUrl = 'http://' + data.Proxy.ip + ':' + data.Proxy.port;
-        const username = data.Proxy.username;
-        const password = data.Proxy.password;
-
+        //confinger if have proxy
+        var args = [];
+        ////////////////
+        if (data.Proxy != null) {
+            const proxyUrl = 'http://' + data.Proxy.ip + ':' + data.Proxy.port;
+            const username = data.Proxy.username;
+            const password = data.Proxy.password;
+            args.push(`--proxy-server=${proxyUrl}`, `--no-sandbox`); // TODO تاكد منها قبل النقل
+        }
         const browser = await puppeteer.launch({
-            args: [`--proxy-server=${proxyUrl}`, `--no-sandbox`]
+            args: args
         });
+
+        //////////////////////
+
+        //new page
         const page = await browser.newPage();
 
         if (data.UserAgent != null)
             await page.setUserAgent(data.UserAgent);
-
-        await page.authenticate({ username, password });
-
+        if (data.Proxy != null) {
+            await page.authenticate({ username, password });
+        }
         await page.setCookie(...data.Cookies);
         await page.goto(data.Url);
         ////////////
@@ -37,8 +46,8 @@ try {
 
         }
         catch (err) {
-            console.error(err.message)
-            process.exit(1);
+            console.log(err.message)
+
         }
         ///////////
         ////////////
@@ -64,6 +73,11 @@ try {
         }
 
         while (!await page.evaluate(() => { return window.canexit; })) {
+
+            if (data.hasOwnProperty("outputprint") && data.outputprint) {
+                output = await page.evaluate(() => { return window.output; });
+                console.log("<o$$&ut>" + JSON.stringify(output) + "</o$$&ut>");
+            }
 
             await sleepms(1000);
 
