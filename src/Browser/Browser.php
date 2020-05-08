@@ -143,12 +143,15 @@ class BrowserBase
     /**
      *
      * Setup Cookies
-     * @param Cookie $cookies Setup One cookies
+     * @param Cookie $cookies Setup One cookie
+     * @param bool $removeAll Remove All cookies (reset cookies)
      *
      * @return $this
      */
-    public function SetCookie(Cookie $cookies)
+    public function SetCookie(Cookie $cookies, bool $removeAll = false)
     {
+        if ($removeAll)
+            $this->_cookies = array();
 
         $this->_cookies[] = $cookies;
         return $this;
