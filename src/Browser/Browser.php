@@ -89,6 +89,20 @@ class BrowserBase
         if ($url != null)
             $this->SetUrl($url);
     }
+
+    /**
+     * Set User Agent
+     * @param string $stringUserAgent UserAgent name
+     *
+     * @return $this
+     */
+    public function SetUserAgent(string $stringUserAgent)
+    {
+        $this->_userAgent =  $stringUserAgent;
+
+        return $this;
+    }
+
     /**
      * set up path file js , to injection js
      * @param mixed $jsPassInfo Path file
