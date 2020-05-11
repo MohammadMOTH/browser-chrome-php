@@ -18,9 +18,9 @@ try {
         var args = [];
         ////////////////
         if (data.Proxy != null) {
-            const proxyUrl = 'http://' + data.Proxy.ip + ':' + data.Proxy.port;
-            const username = data.Proxy.username;
-            const password = data.Proxy.password;
+            var proxyUrl = 'http://' + data.Proxy.ip + ':' + data.Proxy.port;
+            var username = data.Proxy.username;
+            var password = data.Proxy.password;
             args.push(`--proxy-server=${proxyUrl}`, `--no-sandbox`); // TODO تاكد منها قبل النقل
         }
         const browser = await puppeteer.launch({
