@@ -38,6 +38,12 @@ Run browser as async ```Run()```
 
 **How Can Install**
 ```
+composer require symfony/process 4.0.x-dev
 composer require browserbotphp/browser
+composer require browserbotphp/stemplates
 npm install puppeteer
+```
+**Example**
+```PHP
+
 ```
