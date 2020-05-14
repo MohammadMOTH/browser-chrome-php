@@ -44,11 +44,12 @@ composer require browserbotphp/stemplates
 npm install puppeteer
 ```
 **Example**
-```javascript test3.js
+test3.js file as javascript 
+```javascript 
 var output = {}; // output object
 var canexit = false; // when is true then stop browser
 ```
-
+PHP Example
 ```PHP
     $proxy = new Proxy("168.81.230.104", 120, "Username", "Passowrd", true); //true  for Set as default 
 
