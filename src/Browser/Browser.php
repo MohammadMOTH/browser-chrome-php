@@ -17,8 +17,13 @@ class BrowserBase
     const PathNodeJsApp = "/NodeApp/app.js";
     const Tagout = "o$$&ut";
     const FileOutputJs = "/fileoutput.js";
+
+    const OutputEverySecand = 1;
+    const OutputJustWhenFinish = 0;
+
     protected  $_timestart = 0;
 
+    protected $_typeOutput = 0;
 
     /**
      * @var string Path info file js
@@ -89,20 +94,6 @@ class BrowserBase
         if ($url != null)
             $this->SetUrl($url);
     }
-
-    /**
-     * Set User Agent
-     * @param string $stringUserAgent UserAgent name
-     *
-     * @return $this
-     */
-    public function SetUserAgent(string $stringUserAgent)
-    {
-        $this->_userAgent =  $stringUserAgent;
-
-        return $this;
-    }
-
     /**
      * set up path file js , to injection js
      * @param mixed $jsPassInfo Path file
@@ -128,6 +119,22 @@ class BrowserBase
 
         return $this;
     }
+
+    /** لتحديد نوع الخرج اثناء عمل البوت
+     * OutputEverySecandUpdate من اجل تحديث الخرج كل ثانية
+     * OutputNramal عند انتهاء الخرج يقوم بتحديث
+     * @param int $SetType
+     *
+     * @return int
+     */
+    public function TypeOutput(int $SetType = null)
+    {
+        if ($SetType  == null)
+            return $this->_typeOutput;
+
+        return $this->_typeOutput = $SetType;
+    }
+
 
     /**
      * Set Url Page
@@ -168,6 +175,7 @@ class BrowserBase
             $this->_cookies = array();
 
         $this->_cookies[] = $cookies;
+
         return $this;
     }
 
@@ -189,6 +197,20 @@ class BrowserBase
 
         return $this;
     }
+
+    /**
+     * Set User Agent
+     * @param string $stringUserAgent UserAgent name
+     *
+     * @return $this
+     */
+    public function SetUserAgent(string $stringUserAgent)
+    {
+        $this->_userAgent =  $stringUserAgent;
+
+        return $this;
+    }
+
 
 
     /**
@@ -271,21 +293,50 @@ class BrowserBase
 
         return $this;
     }
+
+    /**
+     * @return void
+     */
+    public function ClearOutput()
+    {
+
+        $this->_process->clearOutput();
+        $this->_process->clearErrorOutput();
+
+    }
+
     /**
      * return false if not have yet output varible
      * return object output form js file
      * @return object|bool
      */
-    public function Output()
+    public function Output($OnRun = false)
     {
+        if ( !$OnRun ){
         if (!$this->IsRun()) {
             $output =  $this->DebugOutput();
             $x =     explode("<" . self::Tagout . ">", $output);
             if (count($x) < 2)
                 return false;
+
+
+
+
             return  json_decode(explode("</" . self::Tagout . ">", $x[1])[0]);
         }
-        return false;
+
+    }else{
+        $output =  $this->DebugOutput();
+        $x =     explode("<" . self::Tagout . ">", $output);
+        if (count($x) < 2)
+            return false;
+
+        if ( $this->_typeOutput == self::OutputEverySecand )
+        $this->ClearOutput();
+        return  json_decode(explode("</" . self::Tagout . ">", $x[1])[0]);
+    }
+    return false;
+
     }
     /**
      * Get all output as string
@@ -396,6 +447,10 @@ class BrowserBase
             $this->_cookies[$i]->id = $i + 1;
         }
 
+
+            $data->outputprint =  $this->TypeOutput() ;
+
+
         $data->Cookies =  $this->_cookies;
         $data->Proxy =  $this->_proxy;
         $data->Url =  $this->_url;
@@ -406,8 +461,11 @@ class BrowserBase
         if ($this->_makePhoto != null)
             $data->SaveImage = $Stemp->Process($this->_makePhoto)->GetOutput();
 
-        $data->FileOutputJs = __DIR__ . self::FileOutputJs;
-        $this->_command[] = json_encode($data);
+
+            $data->FileOutputJs = __DIR__ . self::FileOutputJs;
+             $data->TypeOutput = $this->TypeOutput();
+
+            $this->_command[] = json_encode($data);
 
         return $this;
     }

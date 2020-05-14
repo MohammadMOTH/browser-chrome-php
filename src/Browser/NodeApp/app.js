@@ -71,12 +71,16 @@ try {
             }
 
         }
-
+var outputX ;
         while (!await page.evaluate(() => { return window.canexit; })) {
+/*  if (data.hasOwnProperty("TypeOutput") && data.TypeOutput == 1) {
 
+                console.log("<o$$&ut>" + JSON.stringify(await page.evaluate(() => { return window.output; })) + "</o$$&ut>");
+            }
+*/
             if (data.hasOwnProperty("outputprint") && data.outputprint) {
-                output = await page.evaluate(() => { return window.output; });
-                console.log("<o$$&ut>" + JSON.stringify(output) + "</o$$&ut>");
+                outputX = await page.evaluate(() => { return window.output; });
+                console.log("<o$$&ut>" + JSON.stringify(outputX) + "</o$$&ut>");
             }
 
             await sleepms(1000);

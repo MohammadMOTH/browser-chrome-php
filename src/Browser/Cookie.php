@@ -2,12 +2,8 @@
 
 namespace BrowserBotPHP\Browser\Browser;
 
+use JsonSerializable;
 
-
-/**
- * Cookie for Browser
- * Class Cookie
- */
 class Cookie
 {
 
@@ -25,8 +21,11 @@ class Cookie
     public $id = null;
     function __construct()
     {
-        if (method_exists($this, $method_name = '__construct' . func_num_args())) {
-            call_user_func_array(array($this, $method_name),  func_get_args());
+        $get_arguments       = func_get_args();
+        $number_of_arguments = func_num_args();
+
+        if (method_exists($this, $method_name = '__construct' . $number_of_arguments)) {
+            call_user_func_array(array($this, $method_name), $get_arguments);
         }
     }
     function __construct10(
@@ -67,18 +66,5 @@ class Cookie
         $this->name =    $name;
         $this->value = $value;
     }
-    /*
-     "domain": "exmple.com",
-        "expirationDate": 151848484, // Math.floor(Date.now()/1000) + 172800
-        "hostOnly": false,
-        "httpOnly": true,
-        "name": "key",
-        "path": "/",
-        "sameSite": "no_restriction",
-        "secure": true,
-        "session": false,
-        "storeId": "0",
-        "value": "value",
-        "id": 1
-        */
+
 }
