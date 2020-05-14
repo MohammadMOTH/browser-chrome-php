@@ -44,6 +44,40 @@ composer require browserbotphp/stemplates
 npm install puppeteer
 ```
 **Example**
-```PHP
+```javascript test3.js
+var output = {}; // output object
+var canexit = false; // when is true then stop browser
+```
 
+```PHP
+    $proxy = new Proxy("168.81.230.104", 120, "Username", "Passowrd", true); //true  for Set as default 
+
+        $browserRun =  new  BrowserRun(300); // 300 sec , time out
+
+        $Cookie = new Cookie(
+            "www.google.com",
+            "SS",
+   "%3Afe9f6279b37a4296539c30b49dff87cad9cf789dbd843afa4f51d785f8a06388ca3ca683dc8ff2c55fc80a9b3a22a153886cc238854473bb1135fb28417e9508"
+        );
+        $browserRun->SetCookie($Cookie); // Set Cookies 
+
+        $browserRun->SetJsCodePath("./test3.js"); // run js
+
+
+        $browserRun->SetUrl("https://www.google.com"); // set url
+
+        $browserRun->SavePhotoPath('./public/test.png');  // set path photo
+
+        $browserRun->Run(); // run browser as async
+
+        while (ListBrowser::UpdateBrwoser()) { // update all browser
+            var_dump($browserRun->DebugOutput());
+            sleep(1);
+        }
+
+        var_dump($browserRun->DebugOutput()); // update Get output debug 
+          while ($browserRun->IsRun()) { // check if run 
+            var_dump($browserRun->DebugOutput());
+             var_dump($browserRun->Output()); // get output as object
+          }
 ```
