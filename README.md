@@ -35,3 +35,9 @@ Get output as object from js ```Output($OnRun = false)```
 show output Debug ```DebugOutput()```
 
 Run browser as async ```Run()```
+
+**How Can Install**
+```
+composer require browserbotphp/browser
+npm install puppeteer
+```
