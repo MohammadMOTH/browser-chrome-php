@@ -328,7 +328,7 @@ class BrowserBase
 
 
 
-            return  json_decode(explode("</" . self::Tagout . ">", $x[1])[0]);
+            return  json_decode(explode("</" . self::Tagout . ">", $x[count( $x)-1])[0]);
         }
 
     }else{
