@@ -305,6 +305,12 @@ class BrowserBase
 
     }
 
+    public function ResetJsCodePath()
+    {
+
+        $this->_jsPassCode = array();
+    }
+
     /**
      * return false if not have yet output varible
      * return object output form js file
