@@ -458,6 +458,10 @@ class BrowserBase
 
 
         $data->Cookies =  $this->_cookies;
+        if (Proxy::$DefaultProxy != null && $this->_proxy == null) {
+
+            $this->_proxy = &Proxy::$DefaultProxy;
+        }
         $data->Proxy =  $this->_proxy;
         $data->Url =  $this->_url;
         $data->JsInfoPath =  $this->_jsPassInfo;
