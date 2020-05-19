@@ -1,3 +1,26 @@
+var browser = {};
+var page = {};
+async  function exitHandler(options, exitCode) {
+    if (browser.hasOwnProperty("close") )
+    await browser.close();
+    if (page.hasOwnProperty("close") )
+    await page.close();
+
+    process.exit();
+}
+//do something when app is closing
+process.on('exit', exitHandler.bind(null,{cleanup:true}));
+
+//catches ctrl+c event
+process.on('SIGINT', exitHandler.bind(null, {exit:true}));
+
+// catches "kill pid" (for example: nodemon restart)
+process.on('SIGUSR1', exitHandler.bind(null, {exit:true}));
+process.on('SIGUSR2', exitHandler.bind(null, {exit:true}));
+
+//catches uncaught exceptions
+process.on('uncaughtException', exitHandler.bind(null, {exit:true}));
+
 try {
 
 
@@ -23,14 +46,15 @@ try {
             var password = data.Proxy.password;
             args.push(`--proxy-server=${proxyUrl}`, `--no-sandbox`); // TODO تاكد منها قبل النقل
         }
-        const browser = await puppeteer.launch({
+        var browser = await puppeteer.launch({
             args: args
         });
+
 
         //////////////////////
 
         //new page
-        const page = await browser.newPage();
+        var page = await browser.newPage();
 
         if (data.UserAgent != null)
             await page.setUserAgent(data.UserAgent);
@@ -91,16 +115,18 @@ var outputX ;
 
         const output = await page.evaluate(() => { return window.output; });
         console.log("<o$$&ut>" + JSON.stringify(output) + "</o$$&ut>");
+        process.exit();
 
-        await browser.close();
     })();
 } catch (error) {
     console.error(error.message)
     process.exit();
 }
 
-function sleepms(ms) {
+function   sleepms (ms) {
     return new Promise((resolve) => {
         setTimeout(resolve, ms);
     });
 }
+
+
