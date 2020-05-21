@@ -1,25 +1,30 @@
 var browser = {};
 var page = {};
-async  function exitHandler(options, exitCode) {
-    if (browser.hasOwnProperty("close") )
-    await browser.close();
-    if (page.hasOwnProperty("close") )
-    await page.close();
+var pid = 0;
+async function exitHandler(options, exitCode) {
+    if (browser.hasOwnProperty("close"))
+        await browser.close();
+
+    if (page.hasOwnProperty("close")) { await page.close(); }
+
+    if (pid != 0) {
+        process.kill(pid);
+    }
 
     process.exit();
 }
 //do something when app is closing
-process.on('exit', exitHandler.bind(null,{cleanup:true}));
+process.on('exit', exitHandler.bind(null, { cleanup: true }));
 
 //catches ctrl+c event
-process.on('SIGINT', exitHandler.bind(null, {exit:true}));
+process.on('SIGINT', exitHandler.bind(null, { exit: true }));
 
 // catches "kill pid" (for example: nodemon restart)
-process.on('SIGUSR1', exitHandler.bind(null, {exit:true}));
-process.on('SIGUSR2', exitHandler.bind(null, {exit:true}));
+process.on('SIGUSR1', exitHandler.bind(null, { exit: true }));
+process.on('SIGUSR2', exitHandler.bind(null, { exit: true }));
 
 //catches uncaught exceptions
-process.on('uncaughtException', exitHandler.bind(null, {exit:true}));
+process.on('uncaughtException', exitHandler.bind(null, { exit: true }));
 
 try {
 
@@ -45,10 +50,10 @@ try {
             var username = data.Proxy.username;
             var password = data.Proxy.password;
             args.push(`--proxy-server=${proxyUrl}`); // TODO تاكد منها قبل النقل
-        }else{
+        } else {
             console.log("No Proxy Setup !!");
         }
-        args.push( `--no-sandbox`);
+        args.push(`--no-sandbox`);
 
         var browser = await puppeteer.launch({
             args: args
@@ -65,6 +70,8 @@ try {
         if (data.Proxy != null) {
             await page.authenticate({ username, password });
         }
+        pid = browser.process().pid;
+
         await page.setCookie(...data.Cookies);
         await page.goto(data.Url);
         ////////////
@@ -99,13 +106,13 @@ try {
             }
 
         }
-var outputX ;
+        var outputX;
         while (!await page.evaluate(() => { return window.canexit; })) {
-/*  if (data.hasOwnProperty("TypeOutput") && data.TypeOutput == 1) {
+            /*  if (data.hasOwnProperty("TypeOutput") && data.TypeOutput == 1) {
 
-                console.log("<o$$&ut>" + JSON.stringify(await page.evaluate(() => { return window.output; })) + "</o$$&ut>");
-            }
-*/
+                            console.log("<o$$&ut>" + JSON.stringify(await page.evaluate(() => { return window.output; })) + "</o$$&ut>");
+                        }
+            */
             if (data.hasOwnProperty("outputprint") && data.outputprint) {
                 outputX = await page.evaluate(() => { return window.output; });
                 console.log("<o$$&ut>" + JSON.stringify(outputX) + "</o$$&ut>");
@@ -127,7 +134,7 @@ var outputX ;
     process.exit();
 }
 
-function   sleepms (ms) {
+function sleepms(ms) {
     return new Promise((resolve) => {
         setTimeout(resolve, ms);
     });
