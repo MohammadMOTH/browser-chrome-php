@@ -44,8 +44,12 @@ try {
             var proxyUrl = 'http://' + data.Proxy.ip + ':' + data.Proxy.port;
             var username = data.Proxy.username;
             var password = data.Proxy.password;
-            args.push(`--proxy-server=${proxyUrl}`, `--no-sandbox`); // TODO تاكد منها قبل النقل
+            args.push(`--proxy-server=${proxyUrl}`); // TODO تاكد منها قبل النقل
+        }else{
+            console.log("No Proxy Setup !!");
         }
+        args.push( `--no-sandbox`);
+
         var browser = await puppeteer.launch({
             args: args
         });
