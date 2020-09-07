@@ -127,7 +127,7 @@ class BrowserBase
     /**
      *
      * Set if have proxy var or defulat proxy  : on off
-     * @param string $path Path Save photo
+     * @param bool $UseProxyIfHave set true or false to use proxy 
      *
      * @return $this
      */
