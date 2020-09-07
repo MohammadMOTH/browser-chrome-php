@@ -26,8 +26,6 @@ process.on('SIGUSR2', exitHandler.bind(null, { exit: true }));
 //catches uncaught exceptions
 process.on('uncaughtException', exitHandler.bind(null, { exit: true }));
 
-process.on('SIGTERM', exitHandler.bind(null, { exit: true }));
-
 try {
 
 
@@ -79,7 +77,7 @@ try {
         ////////////
         try {
 
-            await page.addScriptTag({ path: data.FileOutputJs }); // base js file
+            //   await page.addScriptTag({ path: data.FileOutputJs }); // base js file
 
         }
         catch (err) {
@@ -88,41 +86,58 @@ try {
         }
         ///////////
         ////////////
-        try {
-            if (data.JsInfoPath != null)
-                await page.addScriptTag({ path: data.JsInfoPath });
-
-        }
-        catch (err) {
-            console.error(err.message)
-            process.exit(1);
-        }
-        ///////////
-        for (let index = 0; index < data.JsCodePath.length; index++) {
+        var reloadpage = true;
+        while (reloadpage) {
+            reloadpage = false;
             try {
-                await page.addScriptTag({ path: data.JsCodePath[index] });
+                if (data.JsInfoPath != null)
+                    await page.addScriptTag({ path: data.JsInfoPath });
+
             }
             catch (err) {
                 console.error(err.message)
                 process.exit(1);
             }
+            ///////////
+            for (let index = 0; index < data.JsCodePath.length; index++) {
+                try {
+                    await page.addScriptTag({ path: data.JsCodePath[index] });
+                }
+                catch (err) {
+                    console.error(err.message)
+                    process.exit(1);
+                }
 
-        }
-        var outputX;
-        while (!await page.evaluate(() => { return window.canexit; })) {
-            /*  if (data.hasOwnProperty("TypeOutput") && data.TypeOutput == 1) {
-
-                            console.log("<o$$&ut>" + JSON.stringify(await page.evaluate(() => { return window.output; })) + "</o$$&ut>");
-                        }
-            */
-            if (data.hasOwnProperty("outputprint") && data.outputprint) {
-                outputX = await page.evaluate(() => { return window.output; });
-                console.log("<o$$&ut>" + JSON.stringify(outputX) + "</o$$&ut>");
             }
+            var outputX;
+            try {
+                var dataget = false;
+                while (!dataget) {
+                    dataget = await page.evaluate(() => { return window.canexit; });
+                    /*  if (data.hasOwnProperty("TypeOutput") && data.TypeOutput == 1) {
 
-            await sleepms(1000);
+                                    console.log("<o$$&ut>" + JSON.stringify(await page.evaluate(() => { return window.output; })) + "</o$$&ut>");
+                                }
+                    */
+                    if (data.hasOwnProperty("outputprint") && data.outputprint) {
+                        outputX = await page.evaluate(() => { return window.output; });
+                        console.log("<o$$&ut>" + JSON.stringify(outputX) + "</o$$&ut>");
+                    }
+                    console.log("loop" + dataget);
+                    await sleepms(1000);
+                    if (dataget == undefined) {
+                        console.log("Reloading;" + dataget);
+                        reloadpage = true;
+                        break;
+                    }
 
+                }
+            } catch (error) {
+                reloadpage = true;
+                console.log(error);
+            }
         }
+
         if (data.SaveImage != null)
             await page.screenshot({ path: data.SaveImage });
 
