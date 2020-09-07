@@ -67,6 +67,10 @@ class BrowserBase
      */
     protected $_makePhoto = null;
 
+    /**
+     * @var bool Force Stop use proxy if loaded $_proxy var
+     */
+    protected $_useproxy = true;
 
     /** Construct Bots
      * @param integer $MaxTimeout Max Time Run
@@ -302,7 +306,6 @@ class BrowserBase
 
         $this->_process->clearOutput();
         $this->_process->clearErrorOutput();
-
     }
 
     public function ResetJsCodePath()
@@ -318,31 +321,29 @@ class BrowserBase
      */
     public function Output($OnRun = false)
     {
-        if ( !$OnRun ){
-        if (!$this->IsRun()) {
+        if (!$OnRun) {
+            if (!$this->IsRun()) {
+                $output =  $this->DebugOutput();
+                $x =     explode("<" . self::Tagout . ">", $output);
+                if (count($x) < 2)
+                    return false;
+
+
+
+
+                return  json_decode(explode("</" . self::Tagout . ">", $x[count($x) - 1])[0]);
+            }
+        } else {
             $output =  $this->DebugOutput();
             $x =     explode("<" . self::Tagout . ">", $output);
             if (count($x) < 2)
                 return false;
 
-
-
-
-            return  json_decode(explode("</" . self::Tagout . ">", $x[count( $x)-1])[0]);
+            if ($this->_typeOutput == self::OutputEverySecand)
+                $this->ClearOutput();
+            return  json_decode(explode("</" . self::Tagout . ">", $x[1])[0]);
         }
-
-    }else{
-        $output =  $this->DebugOutput();
-        $x =     explode("<" . self::Tagout . ">", $output);
-        if (count($x) < 2)
-            return false;
-
-        if ( $this->_typeOutput == self::OutputEverySecand )
-        $this->ClearOutput();
-        return  json_decode(explode("</" . self::Tagout . ">", $x[1])[0]);
-    }
-    return false;
-
+        return false;
     }
     /**
      * Get all output as string
@@ -454,7 +455,7 @@ class BrowserBase
         }
 
 
-            $data->outputprint =  $this->TypeOutput() ;
+        $data->outputprint =  $this->TypeOutput();
 
 
         $data->Cookies =  $this->_cookies;
@@ -462,7 +463,11 @@ class BrowserBase
 
             $this->_proxy = &Proxy::$DefaultProxy;
         }
+        if (!$this->_useproxy)
+            $this->_proxy = null;
+
         $data->Proxy =  $this->_proxy;
+
         $data->Url =  $this->_url;
         $data->JsInfoPath =  $this->_jsPassInfo;
         $data->JsCodePath =  $this->_jsPassCode;
@@ -472,10 +477,10 @@ class BrowserBase
             $data->SaveImage = $Stemp->Process($this->_makePhoto)->GetOutput();
 
 
-            $data->FileOutputJs = __DIR__ . self::FileOutputJs;
-             $data->TypeOutput = $this->TypeOutput();
+        $data->FileOutputJs = __DIR__ . self::FileOutputJs;
+        $data->TypeOutput = $this->TypeOutput();
 
-            $this->_command[] = json_encode($data);
+        $this->_command[] = json_encode($data);
 
         return $this;
     }
