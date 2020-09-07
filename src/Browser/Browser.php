@@ -110,6 +110,7 @@ class BrowserBase
         return $this;
     }
 
+
     /**
      *
      * Save photo After End
@@ -120,6 +121,19 @@ class BrowserBase
     public function SavePhotoPath(string $path)
     {
         $this->_makePhoto = $path;
+
+        return $this;
+    }
+    /**
+     *
+     * Set if have proxy var or defulat proxy  : on off
+     * @param string $path Path Save photo
+     *
+     * @return $this
+     */
+    public function SetUseProxy(bool $UseProxyIfHave)
+    {
+        $this->_useproxy = $UseProxyIfHave;
 
         return $this;
     }
